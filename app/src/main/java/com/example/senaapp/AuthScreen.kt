@@ -8,6 +8,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.OutlinedTextFieldDefaults
 
 private enum class AuthState {
     WELCOME, LOGIN, CREATE_ACCOUNT
@@ -34,62 +35,79 @@ fun AuthScreen() {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color(0xFF87CEEB) // Light blue background
+        color = Color(0xFF78d5fb) // Light blue background
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(16.dp)
         ) {
-            Text(
-                text = "SeñaApp",
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // Logo
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground), // Replace with your logo
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(150.dp)
-                    .padding(bottom = 32.dp)
-            )
-
-            AnimatedContent(
-                targetState = authState,
-                modifier = Modifier.height(350.dp),
-                transitionSpec = {
-                    if (targetState.ordinal > initialState.ordinal) {
-                        slideInHorizontally { height -> height } togetherWith slideOutHorizontally { height -> -height }
-                    } else {
-                        slideInHorizontally { height -> -height } togetherWith slideOutHorizontally { height -> height }
-                    }
-                },
-                label = "Auth"
-            ) { targetState ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
+            if (authState != AuthState.WELCOME) {
+                IconButton(
+                    onClick = { authState = AuthState.WELCOME },
+                    modifier = Modifier.align(Alignment.TopStart)
                 ) {
-                    when (targetState) {
-                        AuthState.WELCOME -> WelcomeContent(
-                            onLoginClicked = { authState = AuthState.LOGIN },
-                            onCreateAccountClicked = { authState = AuthState.CREATE_ACCOUNT }
-                        )
-                        AuthState.LOGIN -> LoginContent(
-                            onLoginClicked = { email, password -> /* TODO: Handle login */ },
-                            onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
-                        )
-                        AuthState.CREATE_ACCOUNT -> CreateAccountContent(
-                            onCreateAccountClicked = { email, password, confirmPassword -> /* TODO: Handle create account */ },
-                            onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
-                        )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Regresar",
+                        tint = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "SeñaApp",
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Logo
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(bottom = 32.dp)
+                )
+
+                AnimatedContent(
+                    targetState = authState,
+                    modifier = Modifier.height(350.dp),
+                    transitionSpec = {
+                        if (targetState.ordinal > initialState.ordinal) {
+                            slideInHorizontally { height -> height } togetherWith slideOutHorizontally { height -> -height }
+                        } else {
+                            slideInHorizontally { height -> -height } togetherWith slideOutHorizontally { height -> height }
+                        }
+                    },
+                    label = "Auth"
+                ) { targetState ->
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        when (targetState) {
+                            AuthState.WELCOME -> WelcomeContent(
+                                onLoginClicked = { authState = AuthState.LOGIN },
+                                onCreateAccountClicked = { authState = AuthState.CREATE_ACCOUNT }
+                            )
+                            AuthState.LOGIN -> LoginContent(
+                                onLoginClicked = { email, password -> /* TODO: Handle login */ },
+                                onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
+                            )
+                            AuthState.CREATE_ACCOUNT -> CreateAccountContent(
+                                onCreateAccountClicked = { email, password, confirmPassword -> /* TODO: Handle create account */ },
+                                onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
+                            )
+                        }
                     }
                 }
             }
@@ -127,7 +145,7 @@ fun WelcomeContent(
         }
         ClickableText(
             text = AnnotatedString("Modo Invitado"),
-            onClick = { /* TODO: Handle guest mode */ },
+            onClick = { },
             style = TextStyle(color = Color.White, textAlign = TextAlign.Center),
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -145,7 +163,7 @@ fun LoginContent(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
             text = "¡Bienvenido de regreso!",
@@ -220,7 +238,7 @@ fun CreateAccountContent(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
             text = "¡Crea Tu Cuenta!",
