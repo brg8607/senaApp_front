@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "759664982460",
+    "project_id": "lsm-db",
+    "storage_bucket": "lsm-db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759664982460:android:c9a84f1d586aff7a0593b9",
+        "android_client_info": {
+          "package_name": "com.example.senaapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ5RuHrRJiEbSOYVNpzRuMySV2HQX1yqU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
