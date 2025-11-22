@@ -45,18 +45,22 @@ fun AuthScreen() {
             if (authState != AuthState.WELCOME) {
                 IconButton(
                     onClick = { authState = AuthState.WELCOME },
-                    modifier = Modifier.align(Alignment.TopStart)
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 16.dp) // Move it down a bit
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Regresar",
-                        tint = Color.White.copy(alpha = 0.7f)
+                        tint = Color.White.copy(alpha = 0.7f),
+                        modifier = Modifier.size(32.dp) // Make it a bit bigger
                     )
                 }
             }
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
