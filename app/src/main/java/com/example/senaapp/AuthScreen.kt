@@ -1,9 +1,8 @@
 package com.example.senaapp
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,20 +46,19 @@ fun AuthScreen() {
                     onClick = { authState = AuthState.WELCOME },
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(top = 16.dp) // Move it down a bit
+                        .padding(top = 16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Regresar",
                         tint = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.size(32.dp) // Make it a bit bigger
+                        modifier = Modifier.size(32.dp)
                     )
                 }
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -83,35 +81,30 @@ fun AuthScreen() {
 
                 AnimatedContent(
                     targetState = authState,
-                    modifier = Modifier.height(350.dp),
+                    modifier = Modifier.height(520.dp), // Increased height for the new button
                     transitionSpec = {
                         if (targetState.ordinal > initialState.ordinal) {
-                            slideInHorizontally { height -> height } togetherWith slideOutHorizontally { height -> -height }
+                            (slideInVertically { height -> height } + fadeIn(animationSpec = tween(220, delayMillis = 90)))
+                                .togetherWith(slideOutVertically { height -> -height } + fadeOut(animationSpec = tween(90)))
                         } else {
-                            slideInHorizontally { height -> -height } togetherWith slideOutHorizontally { height -> height }
-                        }
+                            (slideInVertically { height -> -height } + fadeIn(animationSpec = tween(220, delayMillis = 90)))
+                                .togetherWith(slideOutVertically { height -> height } + fadeOut(animationSpec = tween(90)))
+                        }.using(SizeTransform(clip = false))
                     },
                     label = "Auth"
                 ) { targetState ->
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        when (targetState) {
-                            AuthState.WELCOME -> WelcomeContent(
-                                onLoginClicked = { authState = AuthState.LOGIN },
-                                onCreateAccountClicked = { authState = AuthState.CREATE_ACCOUNT }
-                            )
-                            AuthState.LOGIN -> LoginContent(
-                                onLoginClicked = { email, password -> /* TODO: Handle login */ },
-                                onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
-                            )
-                            AuthState.CREATE_ACCOUNT -> CreateAccountContent(
-                                onCreateAccountClicked = { email, password, confirmPassword -> /* TODO: Handle create account */ },
-                                onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
-                            )
-                        }
+                    when (targetState) {
+                        AuthState.WELCOME -> WelcomeContent(
+                            onLoginClicked = { authState = AuthState.LOGIN },
+                            onCreateAccountClicked = { authState = AuthState.CREATE_ACCOUNT }
+                        )
+                        AuthState.LOGIN -> LoginContent(
+                            onLoginClicked = { email, password -> /* TODO: Handle login */ },
+                            onForgotPasswordClicked = { /* TODO: Handle forgot password */ }
+                        )
+                        AuthState.CREATE_ACCOUNT -> CreateAccountContent(
+                            onCreateAccountClicked = { name, email, password, confirmPassword -> /* TODO: Handle create account */ }
+                        )
                     }
                 }
             }
@@ -147,9 +140,31 @@ fun WelcomeContent(
         ) {
             Text("Crear Cuenta", color = Color.White)
         }
+        Button(
+            onClick = { /* TODO: Handle Google Sign-in */ },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+            border = BorderStroke(1.dp, Color.Gray),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("Iniciar Sesión con Google", color = Color.Black)
+                Spacer(modifier = Modifier.width(12.dp))
+                Icon(
+                    painter = painterResource(id = R.drawable.google_logo),
+                    contentDescription = "Google logo",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Unspecified
+                )
+            }
+        }
         ClickableText(
             text = AnnotatedString("Modo Invitado"),
-            onClick = { },
+            onClick = { _ -> /* TODO: Handle guest mode */ },
             style = TextStyle(color = Color.White, textAlign = TextAlign.Center),
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -224,7 +239,7 @@ fun LoginContent(
         }
         ClickableText(
             text = AnnotatedString("Olvidé mi contraseña"),
-            onClick = { onForgotPasswordClicked() },
+            onClick = { _ -> onForgotPasswordClicked() },
             style = TextStyle(color = Color.White, textAlign = TextAlign.Center)
         )
     }
@@ -232,9 +247,9 @@ fun LoginContent(
 
 @Composable
 fun CreateAccountContent(
-    onCreateAccountClicked: (String, String, String) -> Unit,
-    onForgotPasswordClicked: () -> Unit
+    onCreateAccountClicked: (String, String, String, String) -> Unit
 ) {
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -250,6 +265,24 @@ fun CreateAccountContent(
             fontWeight = FontWeight.Bold,
             color = Color.White,
             modifier = Modifier.padding(bottom = 16.dp)
+        )
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Nombre") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                cursorColor = Color.Black,
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White
+            ),
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
         )
         OutlinedTextField(
             value = email,
@@ -308,7 +341,7 @@ fun CreateAccountContent(
                 .padding(vertical = 8.dp)
         )
         Button(
-            onClick = { onCreateAccountClicked(email, password, confirmPassword) },
+            onClick = { onCreateAccountClicked(name, email, password, confirmPassword) },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
             modifier = Modifier
                 .fillMaxWidth()
@@ -316,11 +349,6 @@ fun CreateAccountContent(
         ) {
             Text("Crear Cuenta", color = Color.White)
         }
-        ClickableText(
-            text = AnnotatedString("Olvidé mi contraseña"),
-            onClick = { onForgotPasswordClicked() },
-            style = TextStyle(color = Color.White, textAlign = TextAlign.Center)
-        )
     }
 }
 
